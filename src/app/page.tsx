@@ -190,7 +190,7 @@ export default function Home() {
           <h1 className="text-3xl font-bold text-gray-800 mb-4">
             Who wants to be the moderator and note taker?
           </h1>
-          <div className="relative w-80 h-44 mx-auto mb-4 rounded-xl overflow-hidden shadow-lg">
+          <div className="relative w-[500px] h-[280px] mx-auto rounded-xl overflow-hidden shadow-lg">
             <Image
               src="/who-wants-moderator.png"
               alt="Who wants to be the moderator?"
@@ -199,9 +199,6 @@ export default function Home() {
               priority
             />
           </div>
-          <p className="text-gray-600">
-            Randomly assign Moderator and Note Taker for your weekly stand-ups
-          </p>
         </header>
 
         <div className="flex flex-col lg:flex-row gap-8 items-start justify-center">
