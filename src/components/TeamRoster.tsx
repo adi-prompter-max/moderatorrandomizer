@@ -79,37 +79,25 @@ export default function TeamRoster({
                 : 'bg-gray-50 border border-gray-200'
             }`}
           >
-            <div className="flex items-center gap-3">
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={member.isActiveThisWeek}
-                  onChange={(e) =>
-                    onUpdateMember(member.id, { isActiveThisWeek: e.target.checked })
-                  }
-                  disabled={disabled}
-                  className="sr-only peer"
-                />
-                <div className="w-9 h-5 bg-gray-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-green-500 peer-disabled:opacity-50" />
-              </label>
-              <span
-                className={`font-medium ${
-                  member.isActiveThisWeek ? 'text-gray-800' : 'text-gray-400 line-through'
-                }`}
-              >
-                {member.name}
-              </span>
-            </div>
-            <button
-              onClick={() => onRemoveMember(member.id)}
-              disabled={disabled}
-              className="text-gray-400 hover:text-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
-              title="Remove member"
+            <span
+              className={`font-medium ${
+                member.isActiveThisWeek ? 'text-gray-800' : 'text-gray-400 line-through'
+              }`}
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
+              {member.name}
+            </span>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={member.isActiveThisWeek}
+                onChange={(e) =>
+                  onUpdateMember(member.id, { isActiveThisWeek: e.target.checked })
+                }
+                disabled={disabled}
+                className="sr-only peer"
+              />
+              <div className="w-9 h-5 bg-gray-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-green-500 peer-disabled:opacity-50" />
+            </label>
           </div>
         ))}
 
