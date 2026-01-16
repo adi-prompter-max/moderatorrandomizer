@@ -122,7 +122,7 @@ export default function Wheel({
                     dominantBaseline="middle"
                     transform={`rotate(${textRotation}, ${textX}, ${textY})`}
                   >
-                    {member.name.length > 10 ? member.name.substring(0, 10) + '...' : member.name}
+                    {member.name.substring(0, 3).toUpperCase()}
                   </text>
                 </g>
               );
