@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import Image from 'next/image';
 import { TeamMember, SpinResult, SpinPhase } from '@/types';
 import { getTeam, saveTeam, addToHistory, seedDefaultTeam } from '@/lib/storage';
 import { selectWithFairRotation, getLastSpinResult } from '@/lib/selection';
@@ -186,9 +187,18 @@ export default function Home() {
 
       <div className="max-w-6xl mx-auto">
         <header className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">
+          <h1 className="text-3xl font-bold text-gray-800 mb-4">
             Who wants to be the moderator and note taker?
           </h1>
+          <div className="relative w-80 h-44 mx-auto mb-4 rounded-xl overflow-hidden shadow-lg">
+            <Image
+              src="/who-wants-moderator.png"
+              alt="Who wants to be the moderator?"
+              fill
+              className="object-cover"
+              priority
+            />
+          </div>
           <p className="text-gray-600">
             Randomly assign Moderator and Note Taker for your weekly stand-ups
           </p>
