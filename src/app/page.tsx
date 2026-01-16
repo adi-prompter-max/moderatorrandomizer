@@ -1,65 +1,285 @@
-import Image from "next/image";
+'use client';
+
+import { useState, useEffect, useCallback } from 'react';
+import { TeamMember, SpinResult, SpinPhase } from '@/types';
+import { getTeam, saveTeam, addToHistory, seedDefaultTeam } from '@/lib/storage';
+import { selectWithFairRotation, getLastSpinResult } from '@/lib/selection';
+import TeamRoster from '@/components/TeamRoster';
+import Wheel from '@/components/Wheel';
+import Results from '@/components/Results';
+import Celebration from '@/components/Celebration';
+
+// Extended phases to include celebration screens
+type ExtendedPhase = SpinPhase | 'celebrating-moderator' | 'celebrating-notetaker';
 
 export default function Home() {
+  const [team, setTeam] = useState<TeamMember[]>([]);
+  const [spinPhase, setSpinPhase] = useState<ExtendedPhase>('idle');
+  const [selectedModerator, setSelectedModerator] = useState<TeamMember | null>(null);
+  const [selectedNoteTaker, setSelectedNoteTaker] = useState<TeamMember | null>(null);
+  const [result, setResult] = useState<SpinResult | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  // Load team from localStorage on mount (seed default team if empty)
+  useEffect(() => {
+    setMounted(true);
+    const savedTeam = getTeam();
+    if (savedTeam.length > 0) {
+      setTeam(savedTeam);
+    } else {
+      // Seed with default team members
+      const defaultTeam = seedDefaultTeam();
+      setTeam(defaultTeam);
+    }
+  }, []);
+
+  // Save team to localStorage whenever it changes
+  useEffect(() => {
+    if (mounted && team.length > 0) {
+      saveTeam(team);
+    }
+  }, [team, mounted]);
+
+  const activeMembers = team.filter(m => m.isActiveThisWeek);
+
+  const handleUpdateMember = (id: string, updates: Partial<TeamMember>) => {
+    setTeam(prev =>
+      prev.map(m => (m.id === id ? { ...m, ...updates } : m))
+    );
+  };
+
+  const handleAddMember = (member: TeamMember) => {
+    setTeam(prev => [...prev, member]);
+  };
+
+  const handleRemoveMember = (id: string) => {
+    setTeam(prev => prev.filter(m => m.id !== id));
+  };
+
+  const handleResetWeek = () => {
+    setTeam(prev =>
+      prev.map(m => ({ ...m, isActiveThisWeek: true }))
+    );
+    setResult(null);
+    setSpinPhase('idle');
+    setSelectedModerator(null);
+    setSelectedNoteTaker(null);
+  };
+
+  const startSpin = () => {
+    if (activeMembers.length < 2) {
+      alert('You need at least 2 active members to spin!');
+      return;
+    }
+
+    // Get last week's result to exclude those members
+    const lastResult = getLastSpinResult();
+    const excludeFromModerator: string[] = [];
+
+    // Exclude last week's moderator (if we have enough members)
+    if (lastResult && activeMembers.length > 2) {
+      excludeFromModerator.push(lastResult.moderator.id);
+    }
+
+    // Select moderator first
+    const moderator = selectWithFairRotation(activeMembers, 'lastModeratorAt', excludeFromModerator);
+    setSelectedModerator(moderator);
+    setSpinPhase('spinning-moderator');
+  };
+
+  // When moderator wheel spin animation completes, show celebration
+  const handleModeratorSpinComplete = useCallback(() => {
+    setSpinPhase('celebrating-moderator');
+  }, []);
+
+  // When moderator celebration is dismissed, start note-taker spin
+  const handleModeratorCelebrationComplete = useCallback(() => {
+    if (!selectedModerator) return;
+
+    // Get last week's result to exclude those members
+    const lastResult = getLastSpinResult();
+    const excludeFromNoteTaker: string[] = [selectedModerator.id]; // Always exclude current moderator
+
+    // Exclude last week's note taker (if we have enough members)
+    if (lastResult && activeMembers.length > 3) {
+      excludeFromNoteTaker.push(lastResult.noteTaker.id);
+    }
+
+    // Select note taker (excluding current moderator and last week's note taker)
+    const noteTaker = selectWithFairRotation(
+      activeMembers,
+      'lastNoteTakerAt',
+      excludeFromNoteTaker
+    );
+    setSelectedNoteTaker(noteTaker);
+    setSpinPhase('spinning-notetaker');
+  }, [selectedModerator, activeMembers]);
+
+  // When note-taker wheel spin animation completes, show celebration
+  const handleNoteTakerSpinComplete = useCallback(() => {
+    setSpinPhase('celebrating-notetaker');
+  }, []);
+
+  // When note-taker celebration is dismissed, show final results
+  const handleNoteTakerCelebrationComplete = useCallback(() => {
+    if (!selectedModerator || !selectedNoteTaker) return;
+
+    const now = new Date().toISOString();
+
+    // Update team with new role timestamps
+    setTeam(prev =>
+      prev.map(m => {
+        if (m.id === selectedModerator.id) {
+          return { ...m, lastModeratorAt: now };
+        }
+        if (m.id === selectedNoteTaker.id) {
+          return { ...m, lastNoteTakerAt: now };
+        }
+        return m;
+      })
+    );
+
+    // Create and save result
+    const spinResult: SpinResult = {
+      moderator: selectedModerator,
+      noteTaker: selectedNoteTaker,
+      timestamp: now,
+    };
+
+    addToHistory(spinResult);
+    setResult(spinResult);
+    setSpinPhase('complete');
+  }, [selectedModerator, selectedNoteTaker]);
+
+  const handleReset = () => {
+    setResult(null);
+    setSpinPhase('idle');
+    setSelectedModerator(null);
+    setSelectedNoteTaker(null);
+  };
+
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100 flex items-center justify-center">
+        <div className="text-gray-500">Loading...</div>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100 py-8 px-4">
+      {/* Celebration Overlays */}
+      {spinPhase === 'celebrating-moderator' && selectedModerator && (
+        <Celebration
+          member={selectedModerator}
+          roleType="moderator"
+          onComplete={handleModeratorCelebrationComplete}
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+      )}
+      {spinPhase === 'celebrating-notetaker' && selectedNoteTaker && (
+        <Celebration
+          member={selectedNoteTaker}
+          roleType="notetaker"
+          onComplete={handleNoteTakerCelebrationComplete}
+        />
+      )}
+
+      <div className="max-w-6xl mx-auto">
+        <header className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">
+            Stand-up Wheel
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="text-gray-600">
+            Randomly assign Moderator and Note Taker for your weekly stand-ups
           </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+        </header>
+
+        <div className="flex flex-col lg:flex-row gap-8 items-start justify-center">
+          {/* Left Panel - Team Roster */}
+          <div className="w-full lg:w-80">
+            <TeamRoster
+              members={team}
+              onUpdateMember={handleUpdateMember}
+              onAddMember={handleAddMember}
+              onRemoveMember={handleRemoveMember}
+              disabled={spinPhase !== 'idle' && spinPhase !== 'complete'}
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+            {team.length > 0 && (
+              <button
+                onClick={handleResetWeek}
+                className="mt-4 w-full py-2 px-4 text-sm text-gray-600 hover:text-gray-800 hover:bg-white/50 rounded-lg transition-colors"
+              >
+                Reset for Next Week
+              </button>
+            )}
+          </div>
+
+          {/* Center Panel - Wheel */}
+          <div className="flex flex-col items-center gap-6">
+            {activeMembers.length >= 2 ? (
+              <>
+                {spinPhase === 'idle' && (
+                  <div className="flex flex-col items-center gap-4">
+                    <Wheel
+                      members={activeMembers}
+                      isSpinning={false}
+                      targetMemberId={null}
+                      onSpinComplete={() => {}}
+                      label="Ready to Spin"
+                      roleType="moderator"
+                    />
+                    <button
+                      onClick={startSpin}
+                      className="px-8 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-lg font-semibold rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
+                    >
+                      Spin the Wheel!
+                    </button>
+                  </div>
+                )}
+
+                {(spinPhase === 'spinning-moderator' || spinPhase === 'celebrating-moderator') && (
+                  <Wheel
+                    members={activeMembers}
+                    isSpinning={spinPhase === 'spinning-moderator'}
+                    targetMemberId={selectedModerator?.id || null}
+                    onSpinComplete={handleModeratorSpinComplete}
+                    label="Selecting Moderator..."
+                    roleType="moderator"
+                  />
+                )}
+
+                {(spinPhase === 'spinning-notetaker' || spinPhase === 'celebrating-notetaker') && (
+                  <Wheel
+                    members={activeMembers}
+                    isSpinning={spinPhase === 'spinning-notetaker'}
+                    targetMemberId={selectedNoteTaker?.id || null}
+                    onSpinComplete={handleNoteTakerSpinComplete}
+                    label="Selecting Note Taker..."
+                    roleType="notetaker"
+                  />
+                )}
+
+                {spinPhase === 'complete' && result && (
+                  <Results result={result} onReset={handleReset} />
+                )}
+              </>
+            ) : (
+              <div className="text-center py-12 px-8 bg-white/50 rounded-xl">
+                <div className="text-6xl mb-4">🎡</div>
+                <p className="text-gray-600 mb-2">
+                  {team.length === 0
+                    ? 'Add team members to get started'
+                    : 'Mark at least 2 members as active to spin'}
+                </p>
+                <p className="text-sm text-gray-500">
+                  Toggle members on the left to mark them as joining this week
+                </p>
+              </div>
+            )}
+          </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 }
