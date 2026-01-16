@@ -187,7 +187,7 @@ export default function Home() {
       <div className="max-w-6xl mx-auto">
         <header className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-800 mb-2">
-            Stand-up Wheel
+            Who wants to be the moderator and note taker?
           </h1>
           <p className="text-gray-600">
             Randomly assign Moderator and Note Taker for your weekly stand-ups

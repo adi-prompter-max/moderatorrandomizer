@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Stand-up Wheel - Moderator & Note Taker Randomizer",
+  title: "Who wants to be the moderator and note taker?",
   description: "Randomly assign Moderator and Note Taker for your weekly stand-ups with a fun spinning wheel",
 };
 
