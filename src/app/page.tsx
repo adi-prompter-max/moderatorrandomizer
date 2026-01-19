@@ -21,7 +21,7 @@ export default function Home() {
   const [result, setResult] = useState<SpinResult | null>(null);
   const [mounted, setMounted] = useState(false);
   const [hasPlayedAudio, setHasPlayedAudio] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
 
   // Load team from localStorage on mount (seed default team if empty)
   useEffect(() => {
@@ -77,12 +77,10 @@ export default function Home() {
     }
 
     // Play the WWTBAM audio on first spin only
-    if (!hasPlayedAudio) {
-      if (!audioRef.current) {
-        audioRef.current = new Audio('/wwtbam_1000_win.mp3');
-      }
+    if (!hasPlayedAudio && audioRef.current) {
+      audioRef.current.currentTime = 0;
       audioRef.current.play().catch(() => {
-        // Ignore audio play errors (e.g., if user hasn't interacted with page)
+        // Ignore audio play errors
       });
       setHasPlayedAudio(true);
     }
@@ -210,6 +208,9 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100 py-8 px-4">
+      {/* Hidden audio element for WWTBAM sound */}
+      <audio ref={audioRef} src="/wwtbam_1000_win.mp3" preload="auto" />
+
       {/* Celebration Overlays */}
       {spinPhase === 'celebrating-moderator' && selectedModerator && (
         <Celebration
