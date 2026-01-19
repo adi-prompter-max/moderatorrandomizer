@@ -56,7 +56,7 @@ export function generateId(): string {
 const DEFAULT_TEAM_NAMES = [
   'Gino', 'Robert', 'Ann-Christine', 'Alina', 'Sebastian',
   'Mauritz', 'Andreas', 'Anna', 'Aditya', 'Joshua',
-  'Noor', 'Max', 'Justus', 'Johannes', 'Alessandro', 'Kenan'
+  'Noor', 'Max', 'Justus', 'Johannes', 'Alessandro', 'Kenan', 'Steven'
 ];
 
 export function seedDefaultTeam(): TeamMember[] {
