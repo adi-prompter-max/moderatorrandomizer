@@ -159,6 +159,33 @@ export default function Home() {
     setSelectedNoteTaker(null);
   };
 
+  const handleUpdateAssignment = (role: 'moderator' | 'noteTaker', member: TeamMember) => {
+    if (!result) return;
+
+    const now = new Date().toISOString();
+
+    // Update the result
+    const updatedResult: SpinResult = {
+      ...result,
+      [role]: member,
+      timestamp: now,
+    };
+    setResult(updatedResult);
+
+    // Update team timestamps for the new assignment
+    setTeam(prev =>
+      prev.map(m => {
+        if (m.id === member.id) {
+          return {
+            ...m,
+            [role === 'moderator' ? 'lastModeratorAt' : 'lastNoteTakerAt']: now,
+          };
+        }
+        return m;
+      })
+    );
+  };
+
   if (!mounted) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100 flex items-center justify-center">
@@ -268,7 +295,12 @@ export default function Home() {
                 )}
 
                 {spinPhase === 'complete' && result && (
-                  <Results result={result} onReset={handleReset} />
+                  <Results
+                    result={result}
+                    onReset={handleReset}
+                    teamMembers={team}
+                    onUpdateAssignment={handleUpdateAssignment}
+                  />
                 )}
               </>
             ) : (

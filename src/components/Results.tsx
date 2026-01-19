@@ -1,15 +1,18 @@
 'use client';
 
 import { useState } from 'react';
-import { SpinResult } from '@/types';
+import { SpinResult, TeamMember } from '@/types';
 
 interface ResultsProps {
   result: SpinResult | null;
   onReset: () => void;
+  teamMembers: TeamMember[];
+  onUpdateAssignment: (role: 'moderator' | 'noteTaker', member: TeamMember) => void;
 }
 
-export default function Results({ result, onReset }: ResultsProps) {
+export default function Results({ result, onReset, teamMembers, onUpdateAssignment }: ResultsProps) {
   const [copied, setCopied] = useState(false);
+  const [editingRole, setEditingRole] = useState<'moderator' | 'noteTaker' | null>(null);
 
   if (!result) return null;
 
@@ -25,6 +28,16 @@ export default function Results({ result, onReset }: ResultsProps) {
     }
   };
 
+  const handleSelectMember = (role: 'moderator' | 'noteTaker', memberId: string) => {
+    const member = teamMembers.find(m => m.id === memberId);
+    if (member) {
+      onUpdateAssignment(role, member);
+      setEditingRole(null);
+    }
+  };
+
+  const activeMembers = teamMembers.filter(m => m.isActiveThisWeek);
+
   return (
     <div className="w-full max-w-md bg-white rounded-xl shadow-md p-6 animate-fadeIn">
       <h2 className="text-xl font-bold text-gray-800 mb-4 text-center">
@@ -34,17 +47,61 @@ export default function Results({ result, onReset }: ResultsProps) {
       <div className="space-y-4 mb-6">
         <div className="flex items-center gap-4 p-4 bg-yellow-50 rounded-lg border border-yellow-200">
           <span className="text-2xl">🎤</span>
-          <div>
+          <div className="flex-1">
             <p className="text-sm text-gray-500">Moderator</p>
-            <p className="text-lg font-semibold text-gray-800">{result.moderator.name}</p>
+            {editingRole === 'moderator' ? (
+              <select
+                value={result.moderator.id}
+                onChange={(e) => handleSelectMember('moderator', e.target.value)}
+                onBlur={() => setEditingRole(null)}
+                autoFocus
+                className="w-full text-lg font-semibold text-gray-800 bg-white border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+              >
+                {activeMembers.map(member => (
+                  <option key={member.id} value={member.id}>
+                    {member.name}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <p
+                onClick={() => setEditingRole('moderator')}
+                className="text-lg font-semibold text-gray-800 cursor-pointer hover:text-yellow-600 transition-colors"
+                title="Click to edit"
+              >
+                {result.moderator.name} <span className="text-xs text-gray-400">✎</span>
+              </p>
+            )}
           </div>
         </div>
 
         <div className="flex items-center gap-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
           <span className="text-2xl">📝</span>
-          <div>
+          <div className="flex-1">
             <p className="text-sm text-gray-500">Note Taker</p>
-            <p className="text-lg font-semibold text-gray-800">{result.noteTaker.name}</p>
+            {editingRole === 'noteTaker' ? (
+              <select
+                value={result.noteTaker.id}
+                onChange={(e) => handleSelectMember('noteTaker', e.target.value)}
+                onBlur={() => setEditingRole(null)}
+                autoFocus
+                className="w-full text-lg font-semibold text-gray-800 bg-white border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              >
+                {activeMembers.map(member => (
+                  <option key={member.id} value={member.id}>
+                    {member.name}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <p
+                onClick={() => setEditingRole('noteTaker')}
+                className="text-lg font-semibold text-gray-800 cursor-pointer hover:text-blue-600 transition-colors"
+                title="Click to edit"
+              >
+                {result.noteTaker.name} <span className="text-xs text-gray-400">✎</span>
+              </p>
+            )}
           </div>
         </div>
       </div>
