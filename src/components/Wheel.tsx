@@ -116,13 +116,12 @@ export default function Wheel({
                     x={textX}
                     y={textY}
                     fill="#1a1a1a"
-                    fontSize="4"
-                    fontWeight="bold"
+                    fontSize="8"
                     textAnchor="middle"
                     dominantBaseline="middle"
                     transform={`rotate(${textRotation}, ${textX}, ${textY})`}
                   >
-                    {member.name.substring(0, 3).toUpperCase()}
+                    ★
                   </text>
                 </g>
               );
