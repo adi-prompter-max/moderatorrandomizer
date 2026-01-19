@@ -115,11 +115,12 @@ export default function Wheel({
                   <text
                     x={textX}
                     y={textY}
-                    fill="#1a1a1a"
+                    fill="#FFD700"
                     fontSize="8"
                     textAnchor="middle"
                     dominantBaseline="middle"
                     transform={`rotate(${textRotation}, ${textX}, ${textY})`}
+                    style={{ filter: 'drop-shadow(0 0 1px #000)' }}
                   >
                     ★
                   </text>
