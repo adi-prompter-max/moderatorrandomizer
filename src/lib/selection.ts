@@ -1,6 +1,10 @@
 import { TeamMember, SpinResult } from '@/types';
 import { getHistory } from './storage';
 
+// Aditya has a reduced chance of being selected (1 in 10)
+const REDUCED_CHANCE_NAME = 'Aditya';
+const REDUCED_CHANCE_PROBABILITY = 0.1; // 10% chance
+
 /**
  * Get the last spin result from history
  */
@@ -11,6 +15,13 @@ export function getLastSpinResult(): SpinResult | null {
 }
 
 /**
+ * Check if a member has reduced selection chance
+ */
+function hasReducedChance(member: TeamMember): boolean {
+  return member.name.toLowerCase() === REDUCED_CHANCE_NAME.toLowerCase();
+}
+
+/**
  * Role Selection Algorithm with Fair Rotation
  *
  * Priority logic:
@@ -18,6 +29,7 @@ export function getLastSpinResult(): SpinResult | null {
  * 2. People who have never held the role get highest priority
  * 3. People who held the role longest ago get next priority
  * 4. Random selection as tie-breaker among equal priority candidates
+ * 5. Special rule: Aditya has only 1/10 chance of being selected
  *
  * @param members - Array of active team members
  * @param roleKey - Which role timestamp to check ('lastModeratorAt' or 'lastNoteTakerAt')
@@ -70,8 +82,30 @@ export function selectWithFairRotation(
   });
 
   // Random tie-breaker among equal priority candidates
-  const randomIndex = Math.floor(Math.random() * samePriorityCandidates.length);
-  return samePriorityCandidates[randomIndex];
+  let selectedMember = samePriorityCandidates[Math.floor(Math.random() * samePriorityCandidates.length)];
+
+  // Special rule: If Aditya is selected, apply reduced probability
+  if (hasReducedChance(selectedMember)) {
+    const roll = Math.random();
+    // Only 10% chance Aditya actually gets selected
+    if (roll > REDUCED_CHANCE_PROBABILITY) {
+      // Re-select from other candidates (excluding Aditya)
+      const otherCandidates = samePriorityCandidates.filter(m => !hasReducedChance(m));
+
+      if (otherCandidates.length > 0) {
+        selectedMember = otherCandidates[Math.floor(Math.random() * otherCandidates.length)];
+      } else {
+        // If no other same-priority candidates, try from all eligible (excluding Aditya)
+        const otherEligible = eligible.filter(m => !hasReducedChance(m));
+        if (otherEligible.length > 0) {
+          selectedMember = otherEligible[Math.floor(Math.random() * otherEligible.length)];
+        }
+        // If Aditya is the only option, they get selected anyway
+      }
+    }
+  }
+
+  return selectedMember;
 }
 
 /**
