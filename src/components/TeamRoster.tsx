@@ -62,7 +62,7 @@ export default function TeamRoster({
           <button
             onClick={() => setIsAdding(true)}
             disabled={disabled}
-            className="text-sm text-blue-600 hover:text-blue-800 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="text-sm text-purple-600 hover:text-purple-800 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             + Add
           </button>
@@ -75,7 +75,7 @@ export default function TeamRoster({
             key={member.id}
             className={`flex items-center justify-between p-3 rounded-lg transition-colors ${
               member.isActiveThisWeek
-                ? 'bg-green-50 border border-green-200'
+                ? 'bg-purple-50 border border-purple-200'
                 : 'bg-gray-50 border border-gray-200'
             }`}
           >
@@ -96,7 +96,7 @@ export default function TeamRoster({
                 disabled={disabled}
                 className="sr-only peer"
               />
-              <div className="w-9 h-5 bg-gray-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-green-500 peer-disabled:opacity-50" />
+              <div className="w-9 h-5 bg-gray-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-500 peer-disabled:opacity-50" />
             </label>
           </div>
         ))}
@@ -110,12 +110,12 @@ export default function TeamRoster({
               onKeyDown={handleKeyDown}
               placeholder="Enter name..."
               autoFocus
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 text-gray-800"
+              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-300 text-gray-800"
             />
             <button
               onClick={handleAddMember}
               disabled={!newName.trim()}
-              className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Add
             </button>

@@ -45,7 +45,7 @@ export default function Results({ result, onReset, teamMembers, onUpdateAssignme
       </h2>
 
       <div className="space-y-4 mb-6">
-        <div className="flex items-center gap-4 p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+        <div className="flex items-center gap-4 p-4 bg-purple-50 rounded-lg border border-purple-200">
           <span className="text-2xl">🎤</span>
           <div className="flex-1">
             <p className="text-sm text-gray-500">Moderator</p>
@@ -55,7 +55,7 @@ export default function Results({ result, onReset, teamMembers, onUpdateAssignme
                 onChange={(e) => handleSelectMember('moderator', e.target.value)}
                 onBlur={() => setEditingRole(null)}
                 autoFocus
-                className="w-full text-lg font-semibold text-gray-800 bg-white border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                className="w-full text-lg font-semibold text-gray-800 bg-white border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-purple-400"
               >
                 {activeMembers.map(member => (
                   <option key={member.id} value={member.id}>
@@ -66,7 +66,7 @@ export default function Results({ result, onReset, teamMembers, onUpdateAssignme
             ) : (
               <p
                 onClick={() => setEditingRole('moderator')}
-                className="text-lg font-semibold text-gray-800 cursor-pointer hover:text-yellow-600 transition-colors"
+                className="text-lg font-semibold text-gray-800 cursor-pointer hover:text-purple-600 transition-colors"
                 title="Click to edit"
               >
                 {result.moderator.name} <span className="text-xs text-gray-400">✎</span>
@@ -75,7 +75,7 @@ export default function Results({ result, onReset, teamMembers, onUpdateAssignme
           </div>
         </div>
 
-        <div className="flex items-center gap-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+        <div className="flex items-center gap-4 p-4 bg-violet-50 rounded-lg border border-violet-200">
           <span className="text-2xl">📝</span>
           <div className="flex-1">
             <p className="text-sm text-gray-500">Note Taker</p>
@@ -85,7 +85,7 @@ export default function Results({ result, onReset, teamMembers, onUpdateAssignme
                 onChange={(e) => handleSelectMember('noteTaker', e.target.value)}
                 onBlur={() => setEditingRole(null)}
                 autoFocus
-                className="w-full text-lg font-semibold text-gray-800 bg-white border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="w-full text-lg font-semibold text-gray-800 bg-white border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-violet-400"
               >
                 {activeMembers.map(member => (
                   <option key={member.id} value={member.id}>
@@ -96,7 +96,7 @@ export default function Results({ result, onReset, teamMembers, onUpdateAssignme
             ) : (
               <p
                 onClick={() => setEditingRole('noteTaker')}
-                className="text-lg font-semibold text-gray-800 cursor-pointer hover:text-blue-600 transition-colors"
+                className="text-lg font-semibold text-gray-800 cursor-pointer hover:text-violet-600 transition-colors"
                 title="Click to edit"
               >
                 {result.noteTaker.name} <span className="text-xs text-gray-400">✎</span>
@@ -111,8 +111,8 @@ export default function Results({ result, onReset, teamMembers, onUpdateAssignme
           onClick={handleCopy}
           className={`w-full py-3 px-4 rounded-lg font-medium transition-all ${
             copied
-              ? 'bg-green-500 text-white'
-              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              ? 'bg-purple-500 text-white'
+              : 'bg-purple-100 text-purple-700 hover:bg-purple-200'
           }`}
         >
           {copied ? (
@@ -134,7 +134,7 @@ export default function Results({ result, onReset, teamMembers, onUpdateAssignme
 
         <button
           onClick={onReset}
-          className="w-full py-3 px-4 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+          className="w-full py-3 px-4 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition-colors"
         >
           Spin Again
         </button>
