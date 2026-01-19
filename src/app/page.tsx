@@ -78,7 +78,7 @@ export default function Home() {
 
     // Play the WWTBAM audio on first spin only
     if (!hasPlayedAudio && audioRef.current) {
-      audioRef.current.volume = 0.6;
+      audioRef.current.volume = 0.4;
       audioRef.current.currentTime = 0;
       audioRef.current.play().catch(() => {
         // Ignore audio play errors
