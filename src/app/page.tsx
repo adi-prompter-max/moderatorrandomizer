@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { TeamMember, SpinResult, SpinPhase } from '@/types';
 import { getTeam, saveTeam, addToHistory, seedDefaultTeam } from '@/lib/storage';
@@ -20,8 +20,6 @@ export default function Home() {
   const [selectedNoteTaker, setSelectedNoteTaker] = useState<TeamMember | null>(null);
   const [result, setResult] = useState<SpinResult | null>(null);
   const [mounted, setMounted] = useState(false);
-  const [hasPlayedAudio, setHasPlayedAudio] = useState(false);
-  const audioRef = useRef<HTMLAudioElement>(null);
 
   // Load team from localStorage on mount (seed default team if empty)
   useEffect(() => {
@@ -67,23 +65,12 @@ export default function Home() {
     setSpinPhase('idle');
     setSelectedModerator(null);
     setSelectedNoteTaker(null);
-    setHasPlayedAudio(false); // Allow audio to play again on next week's first spin
   };
 
   const startSpin = () => {
     if (activeMembers.length < 2) {
       alert('You need at least 2 active members to spin!');
       return;
-    }
-
-    // Play the WWTBAM audio on first spin only
-    if (!hasPlayedAudio && audioRef.current) {
-      audioRef.current.volume = 0.4;
-      audioRef.current.currentTime = 0;
-      audioRef.current.play().catch(() => {
-        // Ignore audio play errors
-      });
-      setHasPlayedAudio(true);
     }
 
     // Get last week's result to exclude those members
@@ -209,9 +196,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100 py-8 px-4">
-      {/* Hidden audio element for WWTBAM sound */}
-      <audio ref={audioRef} src="/wwtbam_1000_win.mp3" preload="auto" />
-
       {/* Celebration Overlays */}
       {spinPhase === 'celebrating-moderator' && selectedModerator && (
         <Celebration
