@@ -91,3 +91,29 @@ export function seedDefaultTeam(): TeamMember[] {
   saveTeam(team);
   return team;
 }
+
+// Add any missing default team members to an existing team
+export function addMissingDefaultMembers(existingTeam: TeamMember[]): TeamMember[] {
+  const existingNames = existingTeam.map(m => m.name.toLowerCase());
+  const missingMembers: TeamMember[] = [];
+
+  for (const name of DEFAULT_TEAM_NAMES) {
+    if (!existingNames.includes(name.toLowerCase())) {
+      missingMembers.push({
+        id: generateId(),
+        name,
+        isActiveThisWeek: true,
+        lastModeratorAt: null,
+        lastNoteTakerAt: null,
+      });
+    }
+  }
+
+  if (missingMembers.length > 0) {
+    const updatedTeam = [...existingTeam, ...missingMembers];
+    saveTeam(updatedTeam);
+    return updatedTeam;
+  }
+
+  return existingTeam;
+}

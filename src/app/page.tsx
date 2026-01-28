@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { TeamMember, SpinResult, SpinPhase } from '@/types';
-import { getTeam, saveTeam, addToHistory, seedDefaultTeam, getCurrentWeekRoles, saveCurrentWeekRoles, CurrentWeekRoles } from '@/lib/storage';
+import { getTeam, saveTeam, addToHistory, seedDefaultTeam, getCurrentWeekRoles, saveCurrentWeekRoles, CurrentWeekRoles, addMissingDefaultMembers } from '@/lib/storage';
 import { selectWithFairRotation, getLastSpinResult } from '@/lib/selection';
 import TeamRoster from '@/components/TeamRoster';
 import Wheel from '@/components/Wheel';
@@ -35,7 +35,9 @@ export default function Home() {
     setMounted(true);
     const savedTeam = getTeam();
     if (savedTeam.length > 0) {
-      setTeam(savedTeam);
+      // Add any missing default members (e.g., Steven if not present)
+      const updatedTeam = addMissingDefaultMembers(savedTeam);
+      setTeam(updatedTeam);
     } else {
       // Seed with default team members
       const defaultTeam = seedDefaultTeam();
