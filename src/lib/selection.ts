@@ -1,9 +1,9 @@
 import { TeamMember, SpinResult } from '@/types';
 import { getHistory } from './storage';
 
-// Aditya has a reduced chance of being selected (1 in 10)
+// Aditya has a reduced chance of being selected (1 in 20)
 const REDUCED_CHANCE_NAME = 'Aditya';
-const REDUCED_CHANCE_PROBABILITY = 0.1; // 10% chance
+const REDUCED_CHANCE_PROBABILITY = 0.05; // 5% chance (1 in 20)
 
 /**
  * Get the last spin result from history
@@ -29,7 +29,7 @@ function hasReducedChance(member: TeamMember): boolean {
  * 2. People who have never held the role get highest priority
  * 3. People who held the role longest ago get next priority
  * 4. Random selection as tie-breaker among equal priority candidates
- * 5. Special rule: Aditya has only 1/10 chance of being selected
+ * 5. Special rule: Aditya has only 1/20 chance of being selected
  *
  * @param members - Array of active team members
  * @param roleKey - Which role timestamp to check ('lastModeratorAt' or 'lastNoteTakerAt')
@@ -87,7 +87,7 @@ export function selectWithFairRotation(
   // Special rule: If Aditya is selected, apply reduced probability
   if (hasReducedChance(selectedMember)) {
     const roll = Math.random();
-    // Only 10% chance Aditya actually gets selected
+    // Only 5% chance (1 in 20) Aditya actually gets selected
     if (roll > REDUCED_CHANCE_PROBABILITY) {
       // Re-select from other candidates (excluding Aditya)
       const otherCandidates = samePriorityCandidates.filter(m => !hasReducedChance(m));
