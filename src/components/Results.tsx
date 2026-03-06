@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { SpinResult, TeamMember } from '@/types';
+import { getBadgesForMember } from '@/lib/badges';
 
 interface ResultsProps {
   result: SpinResult | null;
@@ -15,6 +16,9 @@ export default function Results({ result, onReset, teamMembers, onUpdateAssignme
   const [editingRole, setEditingRole] = useState<'moderator' | 'noteTaker' | null>(null);
 
   if (!result) return null;
+
+  const modBadges = getBadgesForMember(result.moderator.name, 'moderator');
+  const noteBadges = getBadgesForMember(result.noteTaker.name, 'noteTaker');
 
   const slackMessage = `🎤 Moderator: ${result.moderator.name}\n📝 Note Taker: ${result.noteTaker.name}`;
 
@@ -72,6 +76,15 @@ export default function Results({ result, onReset, teamMembers, onUpdateAssignme
                 {result.moderator.name} <span className="text-xs text-gray-400">✎</span>
               </p>
             )}
+            {modBadges.length > 0 && (
+              <div className="flex flex-wrap gap-1 mt-1">
+                {modBadges.map((badge, i) => (
+                  <span key={i} className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${badge.color}`}>
+                    {badge.emoji} {badge.label}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
@@ -101,6 +114,15 @@ export default function Results({ result, onReset, teamMembers, onUpdateAssignme
               >
                 {result.noteTaker.name} <span className="text-xs text-gray-400">✎</span>
               </p>
+            )}
+            {noteBadges.length > 0 && (
+              <div className="flex flex-wrap gap-1 mt-1">
+                {noteBadges.map((badge, i) => (
+                  <span key={i} className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${badge.color}`}>
+                    {badge.emoji} {badge.label}
+                  </span>
+                ))}
+              </div>
             )}
           </div>
         </div>

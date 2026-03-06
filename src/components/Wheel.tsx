@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { TeamMember } from '@/types';
+import { startDrumroll, stopDrumroll } from '@/lib/sounds';
 
 interface WheelProps {
   members: TeamMember[];
@@ -48,7 +49,14 @@ export default function Wheel({
 
     setRotation(newRotation);
 
-    // Call completion after spin animation finishes
+    // Start drumroll
+    startDrumroll();
+
+    // Stop drumroll just before the wheel stops, then call completion
+    setTimeout(() => {
+      stopDrumroll();
+    }, 3600);
+
     setTimeout(() => {
       onSpinCompleteRef.current();
     }, 4100);

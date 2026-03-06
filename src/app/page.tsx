@@ -286,13 +286,15 @@ export default function Home() {
           member={selectedModerator}
           roleType="moderator"
           onComplete={handleModeratorCelebrationComplete}
+          pendingResult={{ moderator: selectedModerator, noteTaker: selectedModerator, timestamp: new Date().toISOString() }}
         />
       )}
-      {spinPhase === 'celebrating-notetaker' && selectedNoteTaker && (
+      {spinPhase === 'celebrating-notetaker' && selectedNoteTaker && selectedModerator && (
         <Celebration
           member={selectedNoteTaker}
           roleType="notetaker"
           onComplete={handleNoteTakerCelebrationComplete}
+          pendingResult={{ moderator: selectedModerator, noteTaker: selectedNoteTaker, timestamp: new Date().toISOString() }}
         />
       )}
 
@@ -300,7 +302,7 @@ export default function Home() {
         <header className="text-center mb-8">
           <div className="relative w-[500px] h-[280px] mx-auto rounded-xl overflow-hidden shadow-lg">
             <Image
-              src="/who-wants-moderator.png"
+              src="https://www.it-finanzmagazin.de/wp-content/uploads/2026/02/bsd-tradias-press-image.webp"
               alt="Who wants to be the moderator?"
               fill
               className="object-cover"
