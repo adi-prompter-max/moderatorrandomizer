@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import Image from 'next/image';
 import { TeamMember, SpinResult, SpinPhase } from '@/types';
 import { getTeam, saveTeam, addToHistory, seedDefaultTeam, getCurrentWeekRoles, saveCurrentWeekRoles, CurrentWeekRoles, addMissingDefaultMembers } from '@/lib/storage';
 import { selectWithFairRotation, getLastSpinResult } from '@/lib/selection';
@@ -300,26 +299,6 @@ export default function Home() {
 
       <div className="max-w-6xl mx-auto">
         <header className="text-center mb-8">
-          <h2 className="text-lg font-bold text-gray-700 mb-3">News for this week</h2>
-          <div className="flex items-center justify-center gap-6">
-            <div className="relative w-[500px] h-[280px] rounded-xl overflow-hidden shadow-lg shrink-0">
-              <Image
-                src="https://www.it-finanzmagazin.de/wp-content/uploads/2026/02/bsd-tradias-press-image.webp"
-                alt="Who wants to be the moderator?"
-                fill
-                className="object-cover"
-                priority
-              />
-            </div>
-            <div className="relative w-[500px] h-[280px] rounded-xl overflow-hidden shadow-lg shrink-0 bg-[#5B2EF5]">
-              <Image
-                src="/news-welcome-julien.png"
-                alt="Warm Welcome to Julien!"
-                fill
-                className="object-contain"
-              />
-            </div>
-          </div>
           <div className="mt-4">
             <CurrentWeekRolesDisplay
               moderator={currentWeekRoles.moderator}
