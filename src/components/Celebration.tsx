@@ -5,7 +5,6 @@ import Image from 'next/image';
 import confetti from 'canvas-confetti';
 import { TeamMember, SpinResult } from '@/types';
 import { getBadgesForMember } from '@/lib/badges';
-import { playVictorySound } from '@/lib/sounds';
 
 interface CelebrationProps {
   member: TeamMember;
@@ -53,7 +52,6 @@ export default function Celebration({ member, roleType, onComplete, pendingResul
     if (!hasFired.current) {
       hasFired.current = true;
       fireConfetti();
-      playVictorySound();
     }
   }, []);
 
